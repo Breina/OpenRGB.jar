@@ -25,7 +25,9 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 import lombok.NonNull;
 
 public class OpenRgbClientImpl implements OpenRgbClient {
@@ -79,6 +81,11 @@ public class OpenRgbClientImpl implements OpenRgbClient {
         final var device = responseDevice();
         ObjectLinker.link(device, deviceIndex, this);
         return device;
+    }
+
+    @Override
+    public Device[] getAllControllers() {
+        return IntStream.range(0, getControllerCount()).mapToObj(this::getControllerData).toArray(Device[]::new);
     }
 
     @Override

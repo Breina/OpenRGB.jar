@@ -1,6 +1,5 @@
 import be.breina.openrgb.OpenRgbClient;
 import be.breina.openrgb.OpenRgbClientImpl;
-import be.breina.openrgb.model.Led;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.Arrays;
@@ -9,6 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class OpenRgbClientTest {
+
+    /**
+     * Yeah I know, this isn't unit testing. I just use it to quickly try stuff out.
+     */
 
     private OpenRgbClient openRgbClient;
 
@@ -140,5 +143,10 @@ class OpenRgbClientTest {
             leds[0].setColor(Color.GREEN);
             leds[leds.length - 1].setColor(Color.RED);
         }
+    }
+
+    @Test
+    public void getAllDevices() {
+        System.out.println(Arrays.toString(openRgbClient.getAllControllers()));
     }
 }

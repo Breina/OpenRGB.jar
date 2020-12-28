@@ -15,6 +15,7 @@ public class Mode {
     private final String name;
     private final int value;
 
+    @ToString.Exclude
     @Getter(NONE)
     @Delegate
     private final ModeFlags flags;

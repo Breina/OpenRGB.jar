@@ -4,11 +4,13 @@ import static lombok.AccessLevel.NONE;
 
 import java.io.IOException;
 import java.util.function.Consumer;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import be.breina.openrgb.util.Constants;
 import be.breina.openrgb.util.LittleEndianInputStream;
 
+@EqualsAndHashCode
 @ToString
 @Getter
 public class Device {
@@ -27,6 +29,8 @@ public class Device {
     private final Led[] leds;
     private final Color[] colors;
 
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @Getter(NONE)
     private Consumer<java.awt.Color[]> colorSetter;
 
