@@ -1,6 +1,6 @@
-package be.breina.openrgb.model;
+package be.breina.openrgb.model.enumeration
 
-public enum DeviceType {
+enum class DeviceType {
     MOTHERBOARD,
     DRAM,
     GPU,

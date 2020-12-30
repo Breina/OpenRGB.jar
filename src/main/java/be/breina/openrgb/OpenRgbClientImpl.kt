@@ -1,187 +1,156 @@
-package be.breina.openrgb;
+package be.breina.openrgb
 
-import static be.breina.openrgb.command.CommandConstants.SIZE;
-import static be.breina.openrgb.command.CommandId.REQUEST_CONTROLLER_COUNT;
-import static be.breina.openrgb.command.CommandId.REQUEST_CONTROLLER_DATA;
-import static be.breina.openrgb.command.CommandId.REQUEST_PROTOCOL_VERSION;
-import static be.breina.openrgb.command.CommandId.SET_CLIENT_NAME;
-import static be.breina.openrgb.command.CommandId.UPDATE_LEDS;
-import static be.breina.openrgb.command.CommandId.UPDATE_SINGLE_LED;
-import static java.nio.ByteOrder.LITTLE_ENDIAN;
+import be.breina.openrgb.command.CommandBuilder
+import be.breina.openrgb.command.CommandConstants.SIZE
+import be.breina.openrgb.command.CommandId
+import be.breina.openrgb.command.CommandResponse
+import be.breina.openrgb.model.Device
+import be.breina.openrgb.model.ObjectFactory.device
+import be.breina.openrgb.model.ObjectLinker.link
+import java.awt.Color
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.net.Socket
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.charset.StandardCharsets
+import java.util.*
+import java.util.function.Consumer
+import java.util.stream.IntStream
 
-import be.breina.openrgb.command.CommandBuilder;
-import be.breina.openrgb.command.CommandResponse;
-import be.breina.openrgb.model.Color;
-import be.breina.openrgb.model.Device;
-import be.breina.openrgb.model.ObjectFactory;
-import be.breina.openrgb.model.ObjectLinker;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.IntStream;
-import lombok.NonNull;
-
-public class OpenRgbClientImpl implements OpenRgbClient {
-
-    private static final String IP = "127.0.0.1";
-    private static final int PORT = 6742;
-    private static final String NAME = "OpenRGB.jar";
-    private static final int MAX_PROTOCOL_VERSION = 1;
-
-    private final Socket socket;
-    private final OutputStream outputStream;
-    private final InputStream inputStream;
-    private final int protocolVersion;
-
-    public OpenRgbClientImpl() throws IOException, UnknownHostException {
-        socket = new Socket(IP, PORT);
-
-        outputStream = new BufferedOutputStream(socket.getOutputStream(), SIZE);
-        inputStream = new BufferedInputStream(socket.getInputStream(), SIZE);
-
-        setName(NAME);
-        protocolVersion = getServerProtocolVersion();
-    }
-
-    @Override
-    public void setName(String clientName) {
+class OpenRgbClientImpl : OpenRgbClient {
+    private val socket: Socket = Socket(IP, PORT)
+    private val outputStream: OutputStream
+    private val inputStream: InputStream
+    private val protocolVersion: Int
+    override fun setName(clientName: String) {
         sendMessage(
-            cb -> cb.command(SET_CLIENT_NAME),
-            (clientName + '\0').getBytes(StandardCharsets.US_ASCII)
-        );
+            { cb: CommandBuilder -> cb.command(CommandId.SET_CLIENT_NAME) },
+            *(clientName + '\u0000').toByteArray(StandardCharsets.US_ASCII)
+        )
     }
 
-    @Override
-    public int getServerProtocolVersion() {
-        sendMessage(cb -> cb.command(REQUEST_PROTOCOL_VERSION), MAX_PROTOCOL_VERSION);
-        return responseMessage().getInt();
+    override val serverProtocolVersion: Int
+        get() {
+            sendMessage({ cb: CommandBuilder -> cb.command(CommandId.REQUEST_PROTOCOL_VERSION) }, MAX_PROTOCOL_VERSION)
+            return responseMessage().int
+        }
+    override val controllerCount: Int
+        get() {
+            sendMessage({ cb: CommandBuilder -> cb.command(CommandId.REQUEST_CONTROLLER_COUNT) })
+            return responseMessage().int
+        }
+
+    override fun getControllerData(deviceIndex: Int): Device? {
+        assert(deviceIndex >= 0)
+        sendMessage({ cb: CommandBuilder -> cb.command(CommandId.REQUEST_CONTROLLER_DATA).device(deviceIndex) }, protocolVersion)
+        val device = responseDevice()
+        link(device, deviceIndex, this)
+        return device
     }
 
-    @Override
-    public int getControllerCount() {
-        sendMessage(cb -> cb.command(REQUEST_CONTROLLER_COUNT));
-        return responseMessage().getInt();
+    override val allControllers: Array<Device>
+        get() = IntStream.range(0, controllerCount).mapToObj(::getControllerData).toArray(::arrayOfNulls)
+
+    override fun updateLed(deviceIndex: Int, ledIndex: Int, color: Color) {
+        updateLed(deviceIndex, ledIndex, be.breina.openrgb.model.Color(color.red, color.green, color.blue))
     }
 
-    @Override
-    public Device getControllerData(int deviceIndex) {
-        assert deviceIndex >= 0;
-
-        sendMessage(cb -> cb.command(REQUEST_CONTROLLER_DATA).device(deviceIndex), protocolVersion);
-
-        final var device = responseDevice();
-        ObjectLinker.link(device, deviceIndex, this);
-        return device;
-    }
-
-    @Override
-    public Device[] getAllControllers() {
-        return IntStream.range(0, getControllerCount()).mapToObj(this::getControllerData).toArray(Device[]::new);
-    }
-
-    @Override
-    public void updateLed(int deviceIndex, int ledIndex, java.awt.Color color) {
-        updateLed(deviceIndex, ledIndex, new Color(color));
-    }
-
-    @Override
-    public void updateLeds(int deviceIndex, java.awt.Color... colors) {
+    override fun updateLeds(deviceIndex: Int, vararg colors: Color) {
         updateLeds(
-            deviceIndex, Arrays.stream(colors).map(Color::new).toArray(Color[]::new)
-        );
+            deviceIndex,
+            *Arrays.stream(colors).map { color -> be.breina.openrgb.model.Color(color.red, color.green, color.blue) }
+                .toArray<be.breina.openrgb.model.Color>(::arrayOfNulls)
+        )
     }
 
-    private void sendMessage(Consumer<CommandBuilder> cb, int data) {
-        sendMessage(cb,
-            ByteBuffer.allocate(4).order(LITTLE_ENDIAN).putInt(data).array()
-        );
+    private fun sendMessage(cb: Consumer<CommandBuilder>, data: Int) {
+        sendMessage(
+            cb,
+            *ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(data).array()
+        )
     }
 
-    private void sendMessage(Consumer<CommandBuilder> cb, byte... data) {
-        final var commandBuilder = new CommandBuilder()
-            .size(data.length);
-        cb.accept(commandBuilder);
-        final var commandHeader = commandBuilder.build();
-
+    private fun sendMessage(cb: Consumer<CommandBuilder>, vararg data: Byte) {
+        val commandBuilder = CommandBuilder()
+            .size(data.size)
+        cb.accept(commandBuilder)
+        val commandHeader = commandBuilder.build()
         try {
-            outputStream.write(commandHeader);
-
-            if (data.length != 0) {
-                outputStream.write(data);
+            outputStream.write(commandHeader)
+            if (data.isNotEmpty()) {
+                outputStream.write(data)
             }
-
-            outputStream.flush();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            outputStream.flush()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 
-    private byte[] readMessage() {
+    private fun readMessage(): ByteArray {
         try {
-            final var responseHeader = CommandResponse.from(inputStream.readNBytes(SIZE));
-            return inputStream.readNBytes(responseHeader.getSize());
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            val responseHeader = CommandResponse.from(inputStream.readNBytes(SIZE))
+            return inputStream.readNBytes(responseHeader.size)
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
-        return new byte[0];
+        return ByteArray(0)
     }
 
-    private void updateLed(int deviceIndex, int ledIndex, Color color) {
-        assert deviceIndex >= 0;
-
-        final var request = ByteBuffer.allocate(8)
-            .order(LITTLE_ENDIAN)
+    private fun updateLed(deviceIndex: Int, ledIndex: Int, color: be.breina.openrgb.model.Color) {
+        assert(deviceIndex >= 0)
+        val request = ByteBuffer.allocate(8)
+            .order(ByteOrder.LITTLE_ENDIAN)
             .putInt(ledIndex)
-            .put((byte) color.getRed())
-            .put((byte) color.getGreen())
-            .put((byte) color.getBlue());
-
-        request.position(request.position() + 1);
-
-        sendMessage(cb -> cb.command(UPDATE_SINGLE_LED).device(deviceIndex), request.array());
+            .put(color.red)
+            .put(color.green)
+            .put(color.blue)
+        request.position(request.position() + 1)
+        sendMessage({ cb: CommandBuilder -> cb.command(CommandId.UPDATE_SINGLE_LED).device(deviceIndex) }, *request.array())
     }
 
-    private void updateLeds(int deviceIndex, @NonNull Color... colors) {
-        assert deviceIndex >= 0;
-
-        final var request = ByteBuffer.allocate(4 + 2 + 4 * colors.length)
-            .order(LITTLE_ENDIAN)
+    private fun updateLeds(deviceIndex: Int, vararg colors: be.breina.openrgb.model.Color) {
+        assert(deviceIndex >= 0)
+        val request = ByteBuffer.allocate(4 + 2 + 4 * colors.size)
+            .order(ByteOrder.LITTLE_ENDIAN)
             .position(4)
-            .putShort((short) colors.length);
-
-        Arrays.stream(colors).forEach(color -> request
-            .put((byte) color.getRed())
-            .put((byte) color.getGreen())
-            .put((byte) color.getBlue())
-            .position(request.position() + 1)
-        );
-
-        sendMessage(cb -> cb.command(UPDATE_LEDS).device(deviceIndex), request.array());
-    }
-
-    private ByteBuffer responseMessage() {
-        return ByteBuffer.wrap(readMessage()).order(LITTLE_ENDIAN);
-    }
-
-    private Device responseDevice() {
-        try {
-            inputStream.skipNBytes(SIZE);
-            return ObjectFactory.device(inputStream);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            .putShort(colors.size.toShort())
+        Arrays.stream(colors).forEach { color: be.breina.openrgb.model.Color ->
+            request
+                .put(color.red)
+                .put(color.green)
+                .put(color.blue)
+                .position(request.position() + 1)
         }
-        return null;
+        sendMessage({ cb: CommandBuilder -> cb.command(CommandId.UPDATE_LEDS).device(deviceIndex) }, *request.array())
+    }
+
+    private fun responseMessage(): ByteBuffer = ByteBuffer.wrap(readMessage()).order(ByteOrder.LITTLE_ENDIAN)
+
+    private fun responseDevice(): Device? {
+        try {
+            inputStream.skipNBytes(SIZE.toLong())
+            return device(inputStream)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    companion object {
+        private const val IP = "127.0.0.1"
+        private const val PORT = 6742
+        private const val NAME = "OpenRGB.jar"
+        private const val MAX_PROTOCOL_VERSION = 1
+    }
+
+    init {
+        outputStream = BufferedOutputStream(socket.getOutputStream(), SIZE)
+        inputStream = BufferedInputStream(socket.getInputStream(), SIZE)
+        setName(NAME)
+        protocolVersion = serverProtocolVersion
     }
 }
