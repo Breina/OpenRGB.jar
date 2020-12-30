@@ -2,9 +2,7 @@ package be.breina.openrgb.model
 
 import be.breina.openrgb.model.enumeration.ZoneType
 import be.breina.openrgb.util.LittleEndianInputStream
-import lombok.ToString
 
-@ToString
 class Zone internal constructor(
     val name: String?,
     val type: ZoneType,

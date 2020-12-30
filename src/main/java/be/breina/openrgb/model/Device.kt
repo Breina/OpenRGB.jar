@@ -3,7 +3,6 @@ package be.breina.openrgb.model
 import be.breina.openrgb.model.enumeration.DeviceType
 import be.breina.openrgb.util.Constants
 import be.breina.openrgb.util.LittleEndianInputStream
-import lombok.EqualsAndHashCode
 import java.util.function.Consumer
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -26,7 +25,6 @@ class Device private constructor(
 
     val activeMode: Mode get() = modes[activeModeIndex]
 
-    @EqualsAndHashCode.Exclude
     private var colorSetter: Consumer<Array<java.awt.Color>>? = null
 
     fun setColors(vararg colors: java.awt.Color) {
