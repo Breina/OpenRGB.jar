@@ -28,8 +28,8 @@ class OpenRgbClientImpl : OpenRgbClient {
     private val protocolVersion: Int
     override fun setName(clientName: String) {
         sendMessage(
-            { cb: CommandBuilder -> cb.command(CommandId.SET_CLIENT_NAME) },
-            *(clientName + '\u0000').toByteArray(StandardCharsets.US_ASCII)
+                { cb: CommandBuilder -> cb.command(CommandId.SET_CLIENT_NAME) },
+                *(clientName + '\u0000').toByteArray(StandardCharsets.US_ASCII)
         )
     }
 
@@ -61,22 +61,22 @@ class OpenRgbClientImpl : OpenRgbClient {
 
     override fun updateLeds(deviceIndex: Int, vararg colors: Color) {
         updateLeds(
-            deviceIndex,
-            *Arrays.stream(colors).map { color -> be.breina.openrgb.model.Color(color.red, color.green, color.blue) }
-                .toArray<be.breina.openrgb.model.Color>(::arrayOfNulls)
+                deviceIndex,
+                *Arrays.stream(colors).map { color -> be.breina.openrgb.model.Color(color.red, color.green, color.blue) }
+                        .toArray<be.breina.openrgb.model.Color>(::arrayOfNulls)
         )
     }
 
     private fun sendMessage(cb: Consumer<CommandBuilder>, data: Int) {
         sendMessage(
-            cb,
-            *ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(data).array()
+                cb,
+                *ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(data).array()
         )
     }
 
     private fun sendMessage(cb: Consumer<CommandBuilder>, vararg data: Byte) {
         val commandBuilder = CommandBuilder()
-            .size(data.size)
+                .size(data.size)
         cb.accept(commandBuilder)
         val commandHeader = commandBuilder.build()
         try {
@@ -103,11 +103,11 @@ class OpenRgbClientImpl : OpenRgbClient {
     private fun updateLed(deviceIndex: Int, ledIndex: Int, color: be.breina.openrgb.model.Color) {
         assert(deviceIndex >= 0)
         val request = ByteBuffer.allocate(8)
-            .order(ByteOrder.LITTLE_ENDIAN)
-            .putInt(ledIndex)
-            .put(color.red)
-            .put(color.green)
-            .put(color.blue)
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .putInt(ledIndex)
+                .put(color.red)
+                .put(color.green)
+                .put(color.blue)
         request.position(request.position() + 1)
         sendMessage({ cb: CommandBuilder -> cb.command(CommandId.UPDATE_SINGLE_LED).device(deviceIndex) }, *request.array())
     }
@@ -115,15 +115,15 @@ class OpenRgbClientImpl : OpenRgbClient {
     private fun updateLeds(deviceIndex: Int, vararg colors: be.breina.openrgb.model.Color) {
         assert(deviceIndex >= 0)
         val request = ByteBuffer.allocate(4 + 2 + 4 * colors.size)
-            .order(ByteOrder.LITTLE_ENDIAN)
-            .position(4)
-            .putShort(colors.size.toShort())
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .position(4)
+                .putShort(colors.size.toShort())
         Arrays.stream(colors).forEach { color: be.breina.openrgb.model.Color ->
             request
-                .put(color.red)
-                .put(color.green)
-                .put(color.blue)
-                .position(request.position() + 1)
+                    .put(color.red)
+                    .put(color.green)
+                    .put(color.blue)
+                    .position(request.position() + 1)
         }
         sendMessage({ cb: CommandBuilder -> cb.command(CommandId.UPDATE_LEDS).device(deviceIndex) }, *request.array())
     }
