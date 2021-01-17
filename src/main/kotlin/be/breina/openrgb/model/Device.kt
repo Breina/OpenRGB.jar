@@ -7,20 +7,20 @@ import java.util.function.Consumer
 
 @Suppress("MemberVisibilityCanBePrivate")
 class Device private constructor(
-    val type: DeviceType,
-    val name: String,
-    var vendor: String?,
-    val description: String,
-    val version: String,
-    val serial: String,
-    val location: String,
+        val type: DeviceType,
+        val name: String,
+        var vendor: String?,
+        val description: String,
+        val version: String,
+        val serial: String,
+        val location: String,
 
-    private val activeModeIndex: Int,
+        private val activeModeIndex: Int,
 
-    val modes: Array<Mode>,
-    val zones: Array<Zone>,
-    val leds: Array<Led>,
-    val colors: Array<Color>,
+        val modes: Array<Mode>,
+        val zones: Array<Zone>,
+        val leds: Array<Led>,
+        val colors: Array<Color>,
 ) {
 
     val activeMode: Mode get() = modes[activeModeIndex]
@@ -43,11 +43,11 @@ class Device private constructor(
             val name = input.readAscii()
 
             val vendor: String? =
-                if (Constants.serverProtocol >= 1) {
-                    input.readAscii()
-                } else {
-                    null
-                }
+                    if (Constants.serverProtocol >= 1) {
+                        input.readAscii()
+                    } else {
+                        null
+                    }
 
             val description = input.readAscii()
             val version = input.readAscii()

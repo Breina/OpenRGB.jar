@@ -6,8 +6,8 @@ import java.util.function.Consumer
 
 @Suppress("MemberVisibilityCanBePrivate")
 class Led private constructor(
-    val name: String?,
-    val value: Int,
+        val name: String?,
+        val value: Int,
 ) {
 
     private lateinit var colorSetter: Consumer<Color>

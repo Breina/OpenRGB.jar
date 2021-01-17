@@ -6,10 +6,10 @@
 
     <groupId>be.breina</groupId>
     <artifactId>OpenRGB.jar</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
 
     <name>OpenRGB.jar</name>
-    <description>An Java client to use with OpenRGB server</description>
+    <description>A Java client to use with OpenRGB server</description>
     <url>https://github.com/Breina/OpenRGB.jar</url>
 
     <licenses>
@@ -62,7 +62,6 @@
             <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <repositories>

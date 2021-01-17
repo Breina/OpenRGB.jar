@@ -13,9 +13,6 @@ class LittleEndianInputStream(private val inputStream: InputStream) : InputStrea
     fun readInt(): Int = byteBufferOfBytes(4).int
 
     @Throws(IOException::class)
-    fun readShort(): Short = byteBufferOfBytes(2).short
-
-    @Throws(IOException::class)
     fun readUnsignedShort(): Int = byteBufferOfBytes(2).short.toInt() and 0xffff
 
     @Throws(IOException::class)

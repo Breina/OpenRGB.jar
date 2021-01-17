@@ -4,12 +4,12 @@ import be.breina.openrgb.model.enumeration.ZoneType
 import be.breina.openrgb.util.LittleEndianInputStream
 
 class Zone internal constructor(
-    val name: String?,
-    val type: ZoneType,
-    val ledsMin: Int,
-    val ledsMax: Int,
-    val ledCount: Int,
-    var matrix: MatrixMap? = null,
+        val name: String?,
+        val type: ZoneType,
+        val ledsMin: Int,
+        val ledsMax: Int,
+        val ledCount: Int,
+        var matrix: MatrixMap? = null,
 ) {
 
     companion object {

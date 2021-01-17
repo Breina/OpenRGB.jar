@@ -6,18 +6,18 @@ import be.breina.openrgb.util.LittleEndianInputStream
 
 @Suppress("MemberVisibilityCanBePrivate")
 class Mode private constructor(
-    val name: String,
-    val value: Int,
-    private val flags: ModeFlags,
-    val colorMode: ColorMode,
-    val colors: Array<Color>,
+        val name: String,
+        val value: Int,
+        private val flags: ModeFlags,
+        val colorMode: ColorMode,
+        val colors: Array<Color>,
 
-    var speedMin: Int? = null,
-    var speedMax: Int? = null,
-    var speed: Int? = null,
-    var colorMin: Int? = null,
-    var colorMax: Int? = null,
-    var direction: Direction? = null,
+        var speedMin: Int? = null,
+        var speedMax: Int? = null,
+        var speed: Int? = null,
+        var colorMin: Int? = null,
+        var colorMax: Int? = null,
+        var direction: Direction? = null,
 ) : ModeFlags by flags {
 
     internal companion object {

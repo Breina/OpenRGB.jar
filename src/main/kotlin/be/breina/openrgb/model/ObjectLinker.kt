@@ -14,7 +14,10 @@ object ObjectLinker {
             val ledIndex = i
             led.colorMutator { color: Color ->
                 client.updateLed(deviceIndex, ledIndex, color)
-                device.colors[ledIndex].color = color
+                val c = device.colors[ledIndex]
+                c.red = color.red.toByte()
+                c.green = color.green.toByte()
+                c.blue = color.blue.toByte()
             }
             i++
         }
