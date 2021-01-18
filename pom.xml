@@ -6,7 +6,7 @@
 
     <groupId>be.breina</groupId>
     <artifactId>OpenRGB.jar</artifactId>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
 
     <name>OpenRGB.jar</name>
     <description>A Java client to use with OpenRGB server</description>
