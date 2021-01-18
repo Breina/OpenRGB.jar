@@ -13,4 +13,6 @@ class ModeFlagsImpl(private val flags: Int) : ModeFlags {
     override fun hasDirection(): Boolean = flags and 0b0000_1110 != 0
 
     private fun checkBit(bit: Int): Boolean = flags and 1 shl bit != 0
+
+    override fun toString(): String = "ModeFlagsImpl(flags=$flags)"
 }

@@ -17,4 +17,6 @@ class MatrixMap private constructor(val height: Int, val width: Int, val matrix:
             return MatrixMap(height, width, matrix)
         }
     }
+
+    override fun toString(): String = "MatrixMap(height=$height, width=$width, matrix=${matrix.contentToString()})"
 }

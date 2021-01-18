@@ -24,4 +24,6 @@ class Color(r: Byte, g: Byte, b: Byte) {
             return Color(red, green, blue)
         }
     }
+
+    override fun toString(): String = "Color(red=$red, green=$green, blue=$blue)"
 }

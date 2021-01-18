@@ -6,7 +6,7 @@
 
     <groupId>be.breina</groupId>
     <artifactId>OpenRGB.jar</artifactId>
-    <version>0.1.1</version>
+    <version>0.2.0</version>
 
     <name>OpenRGB.jar</name>
     <description>A Java client to use with OpenRGB server</description>
@@ -28,7 +28,8 @@
     </developers>
 
     <scm>
-        <developerConnection>scm:git:git://github.com:Breina/OpenRGB.jar.git</developerConnection>
+        <connection>scm:git:git://github.com:Breina/OpenRGB.jar.git</connection>
+        <developerConnection>scm:git:https://github.com/Breina/OpenRGB.jar.git</developerConnection>
         <url>http://github.com/simpligility/ossrh-demo/tree/master</url>
     </scm>
 
@@ -167,7 +168,7 @@
                     <execution>
                         <id>attach-sources</id>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -185,7 +186,47 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>ci-cd</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+    </distributionManagement>
 
 </project>

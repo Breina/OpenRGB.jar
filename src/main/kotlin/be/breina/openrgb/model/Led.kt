@@ -28,4 +28,6 @@ class Led private constructor(
             return Led(name, value)
         }
     }
+
+    override fun toString(): String = "Led(name=$name, value=$value, colorSetter=$colorSetter)"
 }

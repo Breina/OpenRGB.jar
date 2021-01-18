@@ -73,6 +73,14 @@ class OpenRgbClientImpl : OpenRgbClient {
         )
     }
 
+    override fun updateMode(deviceIndex: Int, modeIndex: Int) {
+        assert(deviceIndex >= 0)
+
+        sendMessage({ cb: CommandBuilder -> cb.command(CommandId.UPDATE_MODE).device(deviceIndex)}, modeIndex)
+        TODO("Not yet implemented")
+
+    }
+
     private fun sendMessage(cb: Consumer<CommandBuilder>, data: Int) {
         sendMessage(
             cb,

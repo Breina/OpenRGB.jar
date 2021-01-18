@@ -11,4 +11,5 @@ interface OpenRgbClient {
     val allControllers: Array<Device>
     fun updateLed(deviceIndex: Int, ledIndex: Int, color: Color)
     fun updateLeds(deviceIndex: Int, vararg colors: Color)
+    fun updateMode(deviceIndex: Int, modeIndex: Int)
 }
