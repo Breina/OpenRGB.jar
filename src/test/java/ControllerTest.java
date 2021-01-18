@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-class OpenRgbClientTest {
+@Disabled
+class ControllerTest {
 
     /**
      * Yeah I know, this isn't unit testing. I just use it to quickly try stuff out.
