@@ -3,12 +3,25 @@ VERY EARLY VERSION! Prone to breaking changes
 
 Java client to connect to an [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) server.
 
-Special thanks to the [C# implementation](https://github.com/diogotr7/OpenRGB.NET), which made this project a walk in the park.
+Special thanks to the [C# implementation](https://github.com/diogotr7/OpenRGB.NET), which made this project a walk in
+the park.
+
+Maven coordinates
+---
+
+```xml
+<dependency>
+    <groupId>be.breina</groupId>
+    <artifactId>OpenRGB.jar</artifactId>
+    <version>0.2.0</version>
+</dependency>
+```
 
 ```java
 import be.breina.openrgb.OpenRgbClientImpl;
 import be.breina.openrgb.OpenRgbClient;
 import be.breina.openrgb.model.Device;
+
 import java.awt.Color;
 
 public class Example {
@@ -24,7 +37,7 @@ public class Example {
 
         // Get device of index 2
         Device device = client.getControllerData(2);
-        
+
         // Device data
         device.getName();
         device.getDescription();
@@ -40,10 +53,10 @@ public class Example {
         device.getLeds()[3].setColor(Color.PINK);
         // or
         client.updateLed(2, 3, Color.PINK);
-        
+
         // Set the name which will show up in OpenRGB
         client.setName("Custom client name");
-        
+
         // Get OpenRGBs protocol version.
         client.getServerProtocolVersion();
     }
@@ -52,6 +65,7 @@ public class Example {
 
 RGBController
 ---
+
 - [x] Get device count
 - [x] Get device data
 - [x] Get protocol version
