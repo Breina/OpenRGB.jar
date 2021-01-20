@@ -4,6 +4,12 @@ import be.breina.openrgb.model.Device
 import java.awt.Color
 
 interface OpenRgbClient {
+
+    /**
+     * Updates the name of this OpenRGB client to the OpenRGB server.
+     * 
+     * @param clientName The name of this OpenRGB client.
+     */
     fun setName(clientName: String)
     val serverProtocolVersion: Int
     val controllerCount: Int
