@@ -6,7 +6,7 @@
 
     <groupId>be.breina</groupId>
     <artifactId>OpenRGB.jar</artifactId>
-    <version>0.2.3</version>
+    <version>0.2.4</version>
 
     <name>OpenRGB.jar</name>
     <description>A Java client to use with OpenRGB server</description>
@@ -249,6 +249,20 @@
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.8</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <!-- The Base URL of Nexus instance where we want to stage -->
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <!-- The server "id" element from settings to use authentication from -->
+                            <serverId>ossrh</serverId>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
