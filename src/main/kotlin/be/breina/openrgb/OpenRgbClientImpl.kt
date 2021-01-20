@@ -17,6 +17,9 @@ import java.util.*
 import java.util.function.Consumer
 import java.util.stream.IntStream
 
+/**
+ * Creates a new instance of the OpenRGB Client.
+ */
 class OpenRgbClientImpl : OpenRgbClient {
     private val socket: Socket = Socket(IP, PORT)
     private val outputStream: OutputStream
@@ -36,13 +39,13 @@ class OpenRgbClientImpl : OpenRgbClient {
             return responseMessage().int
         }
 
-    override val controllerCount: Int
+    override val deviceCount: Int
         get() {
             sendMessage({ cb: CommandBuilder -> cb.command(CommandId.REQUEST_CONTROLLER_COUNT) })
             return responseMessage().int
         }
 
-    override fun getControllerData(deviceIndex: Int): Device? {
+    override fun getDeviceData(deviceIndex: Int): Device? {
         assert(deviceIndex >= 0)
         sendMessage(
             { cb: CommandBuilder -> cb.command(CommandId.REQUEST_CONTROLLER_DATA).device(deviceIndex) },
@@ -53,8 +56,8 @@ class OpenRgbClientImpl : OpenRgbClient {
         return device
     }
 
-    override val allControllers: Array<Device>
-        get() = IntStream.range(0, controllerCount).mapToObj(::getControllerData).toArray(::arrayOfNulls)
+    override val getAllDeviceData: Array<Device>
+        get() = IntStream.range(0, deviceCount).mapToObj(::getDeviceData).toArray(::arrayOfNulls)
 
     override fun updateLed(deviceIndex: Int, ledIndex: Int, color: Color) {
         updateLed(

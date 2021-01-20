@@ -37,9 +37,12 @@
         <maven.compiler.source>15</maven.compiler.source>
         <maven.compiler.target>15</maven.compiler.target>
 
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
         <kotlin.version>1.4.30-M1</kotlin.version>
         <kotlin.compiler.jvmTarget>15</kotlin.compiler.jvmTarget>
-        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+        <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
 
         <junit.version>5.6.2</junit.version>
     </properties>
@@ -212,8 +215,7 @@
                             <goal>javadocJar</goal>
                         </goals>
                     </execution>
-                </executions>
-            </plugin>
+                </executions></plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -257,9 +259,7 @@
                         <version>1.6.8</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <!-- The Base URL of Nexus instance where we want to stage -->
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <!-- The server "id" element from settings to use authentication from -->
                             <serverId>ossrh</serverId>
                             <autoReleaseAfterClose>true</autoReleaseAfterClose>
                         </configuration>

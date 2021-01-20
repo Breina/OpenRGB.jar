@@ -86,7 +86,7 @@ public class ClientIntegrationTest {
         Assumptions.assumeTrue(executesWithoutError(this::setupProtocolVersion1));
 
         final var getControllerCount = CompletableFuture.supplyAsync(
-                () -> openRgbClient.getControllerCount()
+                () -> openRgbClient.getDeviceCount()
         );
 
         final var request = nextRequest();

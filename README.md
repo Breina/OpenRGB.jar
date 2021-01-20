@@ -19,7 +19,6 @@ Maven coordinates
 
 ```java
 import be.breina.openrgb.OpenRgbClientImpl;
-import be.breina.openrgb.OpenRgbClient;
 import be.breina.openrgb.model.Device;
 
 import java.awt.Color;
@@ -30,13 +29,13 @@ public class Example {
         var client = new OpenRgbClientImpl();
 
         // Get the total devices
-        int deviceCount = client.getControllerCount();
+        int deviceCount = client.getDeviceCount();
 
         // Get all devices
-        Device[] devices = client.getAllControllers();
+        Device[] devices = client.getGetAllDeviceData();
 
         // Get device of index 2
-        Device device = client.getControllerData(2);
+        Device device = client.getDeviceData(2);
 
         // Device data
         device.getName();
