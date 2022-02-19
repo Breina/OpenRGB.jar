@@ -1,4 +1,4 @@
-VERY EARLY VERSION! Prone to breaking changes
+OBSOLETE: Use https://gitlab.com/mguimard/openrgb-client instead.
 ===
 
 Java client to connect to an [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) server.
